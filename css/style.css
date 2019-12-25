@@ -1,0 +1,42 @@
+.row-element {
+    display: inline-block;
+    height: 80px;
+    margin-bottom: 20px;
+    border: 4px black;
+}
+
+.black-squares {
+    padding: 8px;
+    width: 80px;
+    height: 80px;
+    background: black;
+}
+.white-squares {
+    padding: 8px;
+    width: 80px;
+    height: 80px;
+    background: white;
+}
+
+.blue-checkers {
+    border-radius: 50%;
+    width: 90%;
+    height: 90%;
+    background: #2b73ff;
+    padding: 4%;
+}
+.red-checkers {
+    border-radius: 50%;
+    width: 90%;
+    height: 90%;
+    background: red;
+    padding: 4%;
+}
+
+th, td {
+    border: 1px solid black;
+}
+
+table {
+    margin-left: 25px;
+}
