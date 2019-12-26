@@ -1,4 +1,3 @@
-let checkersTable = document.getElementById("svg-table");
 let isRedOrBlue = true;
 let previousId = "120";
 let possibleStepRight = "";
@@ -7,6 +6,7 @@ let fullColor = "1.0";
 let alphaColor = "0.7";
 
 window.onload = function() {
+    let checkersTable = document.getElementById("checkers-table");
 
     for (let y = 1; y <= 8; y++)
     {
@@ -20,23 +20,23 @@ window.onload = function() {
             if ((x % 2 === 0) && (y % 2 !== 0) || (x % 2 !== 0) && (y % 2 === 0))
             {
                 // Black squares
-                let checkers = document.createElement('div');
+                let checker = document.createElement('div');
                 square.id = `${x}${y}`;
                 square.onclick = selectSquare;
                 square.className = "black-squares";
 
                 if (y < 4)
                 {    // Blue checkers
-                    checkers.id = square.id + '0';
-                    checkers.className = "blue-checkers";
-                    checkers.onclick = selectCheckerBlue;
+                    checker.id = square.id + '0';
+                    checker.className = "blue-checkers";
+                    checker.onclick = selectCheckerBlue;
                 } else if (y > 5)
                 {     // Red checkers
-                    checkers.id = square.id + '0';
-                    checkers.className = "red-checkers";
-                    checkers.onclick = selectCheckerRed;
+                    checker.id = square.id + '0';
+                    checker.className = "red-checkers";
+                    checker.onclick = selectCheckerRed;
                 }
-                square.appendChild(checkers);
+                square.append(checker);
                 tableRow.append(square);
 
             } else {
@@ -73,22 +73,27 @@ function selectCheckerBlue() { // Blue Turn
     if (!isRedOrBlue) { // Check the turn for select
         if (previousId !== this.id)
         document.getElementById(previousId).style.opacity = fullColor;
-        this.style.opacity = alphaColor;
+        if (isStepEmpty(this.id)) {
+            this.style.opacity = alphaColor;
+        }
         previousId = this.id;
         console.log(isStepEmpty(this.id));
     }
 }
 
 function selectCheckerRed() {
-    if (previousId !== this.id && isRedOrBlue) {
+    if (isRedOrBlue) {
         document.getElementById(previousId).style.opacity = fullColor;
-        this.style.opacity = alphaColor;
+        if (isStepEmpty(this.id)) {
+            this.style.opacity = alphaColor;
+        }
+
         previousId = this.id;
         console.log(isStepEmpty(this.id));
     }
 }
 
-function isStepEmpty(id) {
+function isStepEmpty(checkerId) {
     let positiveNumber = 9;
     let negativeNumber = 11;
 
@@ -96,16 +101,32 @@ function isStepEmpty(id) {
         positiveNumber *= -1;
         negativeNumber *= -1;
     }
-    let right = id / 10 + positiveNumber;
-    let left = id / 10 - negativeNumber;
+    let right = checkerId / 10 + positiveNumber;
+    let left = checkerId / 10 - negativeNumber;
 
-    let rightCheck = isElementNull(right) && isOneCharId(right) && isOutOfBound(right);
-    let leftCheck = isElementNull(left) && isOneCharId(left) && isOutOfBound(left);
+    return checkSquares(isSquareEmpty(right), isSquareEmpty(left), right, left);
 
+    function isSquareEmpty(squareId) {
+        return isElementNull(squareId) && isSingleCharId(squareId) && isOutOfBound(squareId);
+    }
+
+    function isElementNull(id) {
+        return !(!!(document.getElementById(id + '0')));
+    }
+
+    function isOutOfBound(id) {
+        return id.toString()[0] !== "9";
+    }
+
+    function isSingleCharId(id){
+        return id.toString().length > 1;
+    }
+}
+
+function checkSquares(rightCheck, leftCheck, right, left) {
     let correct;
-
     if (rightCheck && leftCheck) {
-        correct = `${id / 10 + positiveNumber} and ${id / 10 - negativeNumber} is empty`;
+        correct = `${right} and ${left} is empty`;
         possibleStepRight = right;
         possibleStepLeft = left;
         setStepColor(right, left, alphaColor)
@@ -122,21 +143,9 @@ function isStepEmpty(id) {
     } else {
         possibleStepRight = -1;
         possibleStepLeft = -1;
-        correct = `All full ${setStepColor(-1, -1, alphaColor)}`;
+        correct = false;
     }
     return correct;
-
-    function isElementNull(id) {
-        return !(!!(document.getElementById(id + '0')));
-    }
-
-    function isOutOfBound(id) {
-        return id.toString()[0] !== "9";
-    }
-
-    function isOneCharId(id){
-        return id.toString().length > 1;
-    }
 }
 
 function setStepColor(num1, num2, color) {
