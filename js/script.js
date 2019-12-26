@@ -75,7 +75,7 @@ function selectCheckerBlue() { // Blue Turn
         document.getElementById(previousId).style.opacity = fullColor;
         this.style.opacity = alphaColor;
         previousId = this.id;
-        console.log(isStepEmpty(this.id, isRedOrBlue));
+        console.log(isStepEmpty(this.id));
     }
 }
 
@@ -84,36 +84,23 @@ function selectCheckerRed() {
         document.getElementById(previousId).style.opacity = fullColor;
         this.style.opacity = alphaColor;
         previousId = this.id;
-        console.log(isStepEmpty(this.id, isRedOrBlue));
+        console.log(isStepEmpty(this.id));
     }
 }
 
-function isStepEmpty(id, checkersColor) {
-    let positiveNumber;
-    let negativeNumber;
-    let left;
-    let right;
-    let rightCheck;
-    let leftCheck;
-    positiveNumber = 9;
-    negativeNumber = 11;
+function isStepEmpty(id) {
+    let positiveNumber = 9;
+    let negativeNumber = 11;
 
-    if (checkersColor) {
-        right = id / 10 + positiveNumber;
-        left = id / 10 - negativeNumber;
-        rightCheck = isElementNull(right) && isOutOfBound(right);
-        leftCheck = isElementNull(left) && isOneCharId(left);
-
-    } else {
+    if (!isRedOrBlue) {
         positiveNumber *= -1;
         negativeNumber *= -1;
-
-        right = id / 10 + positiveNumber;
-        left = id / 10 - negativeNumber;
-
-        rightCheck = isElementNull(right) && isOneCharId(right);
-        leftCheck = isElementNull(left) && isOutOfBound(left);
     }
+    let right = id / 10 + positiveNumber;
+    let left = id / 10 - negativeNumber;
+
+    let rightCheck = isElementNull(right) && isOneCharId(right) && isOutOfBound(right);
+    let leftCheck = isElementNull(left) && isOneCharId(left) && isOutOfBound(left);
 
     let correct;
 
@@ -160,7 +147,5 @@ function setStepColor(num1, num2, color) {
         document.getElementById(num1).style.opacity = color;
     } else if (num1 === -1 && num2 !== -1) {
         document.getElementById(num2).style.opacity = color;
-    } else {
-        return 0;
     }
 }
