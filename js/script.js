@@ -1,24 +1,15 @@
 let checkersTable = document.getElementById("svg-table");
-let turnCounter = 0;
 let isRedOrBlue = true;
-let isCheckerSelected = false;
-let isClicked = true;
 let previousId = "120";
 let possibleStepRight = "";
 let possibleStepLeft = "";
-let colors = {
-    red: "red",
-    blue: "blue",
-    redChecked: "#b24040",
-    blueChecked: "#346ce5",
-    black: "black",
-    white: "white",
-    none: "none",
-};
+let fullColor = "1.0";
+let alphaColor = "0.7";
 
 window.onload = function() {
 
-    for (let y = 1; y <= 8; y++) {
+    for (let y = 1; y <= 8; y++)
+    {
         // Row
         let tableRow = document.createElement('tr');
         for (let x = 1; x <= 8; x++) {
@@ -26,27 +17,25 @@ window.onload = function() {
             tableRow.className = "row-element";
             console.log(tableRow);
 
-            if ((x % 2 === 0) && (y % 2 !== 0) || (x % 2 !== 0) && (y % 2 === 0)) {
+            if ((x % 2 === 0) && (y % 2 !== 0) || (x % 2 !== 0) && (y % 2 === 0))
+            {
                 // Black squares
-                //TODO: set the id of all checkers to the id="xy"
                 let checkers = document.createElement('div');
                 square.id = `${x}${y}`;
                 square.onclick = selectSquare;
                 square.className = "black-squares";
 
-                if (y < 4) {    // Blue checkers
-
+                if (y < 4)
+                {    // Blue checkers
                     checkers.id = square.id + '0';
                     checkers.className = "blue-checkers";
                     checkers.onclick = selectCheckerBlue;
-
-                } else if (y > 5) {     // Red checkers
-
+                } else if (y > 5)
+                {     // Red checkers
                     checkers.id = square.id + '0';
                     checkers.className = "red-checkers";
                     checkers.onclick = selectCheckerRed;
                 }
-
                 square.appendChild(checkers);
                 tableRow.append(square);
 
@@ -64,112 +53,113 @@ window.onload = function() {
 function selectSquare() {
     if (!(!!(document.getElementById(this.id + '0')))) {
         console.log(this.id === possibleStepLeft + " " + this.id === possibleStepRight);
-        if (this.id === possibleStepLeft.toString()) {
-            console.log(`SquareId: ${this.id} previousId: ${previousId}`);
+        if (this.id === possibleStepLeft.toString() || this.id === possibleStepRight.toString()) {
+            consoleLog(this.id);
             this.append(document.getElementById(previousId));
+            document.getElementById(previousId).style.opacity = fullColor;
             document.getElementById(previousId).id = this.id + '0';
-            previousId = this.id + '0';
-            isRedOrBlue = !isRedOrBlue;
-        } else if (this.id === possibleStepRight.toString()) {
-            console.log(`SquareId: ${this.id} previousId: ${previousId}`);
-            this.append(document.getElementById(previousId));
-            document.getElementById(previousId).id = this.id + '0';
+            setStepColor(possibleStepRight, possibleStepLeft, fullColor);
+            this.id.opacity = fullColor;
             previousId = this.id + '0';
             isRedOrBlue = !isRedOrBlue;
         }
     }
-}
-
-function selectCheckerBlue() {
-    if (!isRedOrBlue) {
-        if (previousId !== this.id)
-        document.getElementById(previousId).style.opacity = '1.0';
-        this.style.opacity = '0.7';
-        previousId = this.id;
-        console.log( isStepEmpty(this.id, isRedOrBlue));
+    function consoleLog(id) {
+        console.log(`SquareId: ${id} previousId: ${previousId}`);
     }
-    // console.log(this.id);
 }
 
-
+function selectCheckerBlue() { // Blue Turn
+    if (!isRedOrBlue) { // Check the turn for select
+        if (previousId !== this.id)
+        document.getElementById(previousId).style.opacity = fullColor;
+        this.style.opacity = alphaColor;
+        previousId = this.id;
+        console.log(isStepEmpty(this.id, isRedOrBlue));
+    }
+}
 
 function selectCheckerRed() {
     if (previousId !== this.id && isRedOrBlue) {
-        document.getElementById(previousId).style.opacity = '1.0';
-        this.style.opacity = '0.7';
+        document.getElementById(previousId).style.opacity = fullColor;
+        this.style.opacity = alphaColor;
         previousId = this.id;
-        console.log( isStepEmpty(this.id, isRedOrBlue));
+        console.log(isStepEmpty(this.id, isRedOrBlue));
     }
-    // console.log(this.id);
 }
 
 function isStepEmpty(id, checkersColor) {
     let positiveNumber;
     let negativeNumber;
-    let lineNumberLeft;
-    let lineNumberRight;
     let left;
     let right;
     let rightCheck;
     let leftCheck;
-
+    positiveNumber = 9;
+    negativeNumber = 11;
 
     if (checkersColor) {
-        positiveNumber = 9;
-        negativeNumber = 11;
-        lineNumberLeft = "1";
-        lineNumberRight = "9";
         right = id / 10 + positiveNumber;
         left = id / 10 - negativeNumber;
-        rightCheck = !(!!(document.getElementById(right + '0'))) && right.toString()[0] !== lineNumberRight;
-        leftCheck = !(!!(document.getElementById(left + '0'))) && (left).toString().length > 1;
+        rightCheck = isElementNull(right) && isOutOfBound(right);
+        leftCheck = isElementNull(left) && isOneCharId(left);
 
     } else {
-        positiveNumber = -9;
-        negativeNumber = -11;
-        lineNumberLeft = "9";
-        lineNumberRight = (id / 10 + positiveNumber).toString().length > 1;
+        positiveNumber *= -1;
+        negativeNumber *= -1;
+
         right = id / 10 + positiveNumber;
         left = id / 10 - negativeNumber;
-        rightCheck = !(!!(document.getElementById(right + '0'))) && lineNumberRight;
-        leftCheck = !(!!(document.getElementById(left + '0'))) && (left).toString()[0] !== lineNumberLeft ;
-    }
 
+        rightCheck = isElementNull(right) && isOneCharId(right);
+        leftCheck = isElementNull(left) && isOutOfBound(left);
+    }
 
     let correct;
 
-    // console.log("Left" + left + "Right" + right + "" + lineNumberRight);
     if (rightCheck && leftCheck) {
         correct = `${id / 10 + positiveNumber} and ${id / 10 - negativeNumber} is empty`;
         possibleStepRight = right;
         possibleStepLeft = left;
-        // setStepColor(left, right);
+        setStepColor(right, left, alphaColor)
     } else if (rightCheck) {
         correct = `${right} is empty`;
         possibleStepRight = right;
         possibleStepLeft = -1;
-        // setStepColor(right, -1);
+        setStepColor(right, -1, alphaColor);
     } else if (leftCheck) {
         correct = `${left} is empty`;
         possibleStepRight = -1;
         possibleStepLeft = left;
-        // setStepColor(-1, left);
+        setStepColor(-1, left, alphaColor);
     } else {
         possibleStepRight = -1;
         possibleStepLeft = -1;
-        correct = `All full ${setStepColor(-1, -1)}`;
+        correct = `All full ${setStepColor(-1, -1, alphaColor)}`;
     }
     return correct;
+
+    function isElementNull(id) {
+        return !(!!(document.getElementById(id + '0')));
+    }
+
+    function isOutOfBound(id) {
+        return id.toString()[0] !== "9";
+    }
+
+    function isOneCharId(id){
+        return id.toString().length > 1;
+    }
 }
 
-function setStepColor(num1, num2) {
+function setStepColor(num1, num2, color) {
     if (num1 !== -1 && num2 !== -1) {
-        document.getElementById(num1).style.borderColor = colors.red;
-        document.getElementById(num2).style.borderColor = colors.red;
+        document.getElementById(num1).style.opacity = color;
+        document.getElementById(num2).style.opacity = color;
     } else if (num2 === -1 && num1 !== -1) {
-        document.getElementById(num1).style.borderColor = colors.red;
+        document.getElementById(num1).style.opacity = color;
     } else if (num1 === -1 && num2 !== -1) {
-        document.getElementById(num1).style.borderColor = colors.red;
+        document.getElementById(num2).style.opacity = color;
     } else {
         return 0;
     }
