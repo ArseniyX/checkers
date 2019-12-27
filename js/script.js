@@ -4,6 +4,8 @@ let possibleStepRight = "";
 let possibleStepLeft = "";
 let fullColor = "1.0";
 let alphaColor = "0.7";
+let redCheckers = [];
+let blueCheckers = [];
 
 window.onload = function() {
     let checkersTable = document.getElementById("checkers-table");
@@ -25,16 +27,21 @@ window.onload = function() {
                 square.onclick = selectSquare;
                 square.className = "black-squares";
 
+                function addCheckerToTable(className, onclick) {
+                    checker.id = square.id + '0';
+                    blueCheckers.push(checker.id);
+                    checker.className = className;
+                    checker.onclick = onclick;
+                }
+
                 if (y < 4)
                 {    // Blue checkers
-                    checker.id = square.id + '0';
-                    checker.className = "blue-checkers";
-                    checker.onclick = selectCheckerBlue;
+                    addCheckerToTable("blue-checkers", selectCheckerBlue);
+
                 } else if (y > 5)
                 {     // Red checkers
-                    checker.id = square.id + '0';
-                    checker.className = "red-checkers";
-                    checker.onclick = selectCheckerRed;
+                    addCheckerToTable("red-checkers", selectCheckerRed);
+
                 }
                 square.append(checker);
                 tableRow.append(square);
@@ -48,20 +55,27 @@ window.onload = function() {
         }
     }
     console.log("Checkers table showed!");
+
+
+
 };
 
 function selectSquare() {
     if (!(!!(document.getElementById(this.id + '0')))) {
-        console.log(this.id === possibleStepLeft + " " + this.id === possibleStepRight);
         if (this.id === possibleStepLeft.toString() || this.id === possibleStepRight.toString()) {
+            let prevElement = document.getElementById(previousId);
             consoleLog(this.id);
-            this.append(document.getElementById(previousId));
-            document.getElementById(previousId).style.opacity = fullColor;
-            document.getElementById(previousId).id = this.id + '0';
+            this.append(prevElement);
+            prevElement.style.opacity = fullColor;
+            redCheckers[redCheckers.indexOf(prevElement.id)] = this.id + '0';
+            blueCheckers[blueCheckers.indexOf(prevElement.id)] = this.id + '0';
+            prevElement.id = this.id + '0';
             setStepColor(possibleStepRight, possibleStepLeft, fullColor);
             this.id.opacity = fullColor;
             previousId = this.id + '0';
             isRedOrBlue = !isRedOrBlue;
+            checkAttackNeeded();
+            console.log(blueCheckers);
         }
     }
     function consoleLog(id) {
@@ -69,28 +83,41 @@ function selectSquare() {
     }
 }
 
-function selectCheckerBlue() { // Blue Turn
-    if (!isRedOrBlue) { // Check the turn for select
-        if (previousId !== this.id)
-        document.getElementById(previousId).style.opacity = fullColor;
-        if (isStepEmpty(this.id)) {
-            this.style.opacity = alphaColor;
+function checkAttackNeeded() { //TODO: End the check attack necessaries
+    for (let x = 0; x < blueCheckers.length; x++) {
+        for (let y = 0; y < redCheckers.length; y++) {
+            if ((blueCheckers[x].toString() === (redCheckers[y] - 110).toString()) &&
+                !(blueCheckers[x].toString() === (redCheckers[y] - 220).toString())) {
+                console.log(`${blueCheckers[x].toString()} === ${redCheckers[y] - 110}`);
+            }
+            if ((blueCheckers[x].toString() === (Number(redCheckers[y]) + 90).toString()) &&
+                !(blueCheckers[x].toString() === (Number(redCheckers[y]) + 180).toString())) {
+                console.log(`${blueCheckers[x].toString()} === ${Number(redCheckers[y]) + 90}`);
+            }
         }
-        previousId = this.id;
-        console.log(isStepEmpty(this.id));
+
     }
 }
 
-function selectCheckerRed() {
-    if (isRedOrBlue) {
-        document.getElementById(previousId).style.opacity = fullColor;
-        if (isStepEmpty(this.id)) {
-            this.style.opacity = alphaColor;
-        }
-
-        previousId = this.id;
-        console.log(isStepEmpty(this.id));
+function selectCheckerBlue() { // Blue Turn
+    if (!isRedOrBlue) { // Check the turn for select
+        selectAnyChecker(this);
     }
+}
+
+function selectCheckerRed() { // Any checker selected
+    if (isRedOrBlue) {
+        selectAnyChecker(this);
+    }
+}
+
+function selectAnyChecker(checkerId) {
+    document.getElementById(previousId).style.opacity = fullColor;
+    if (isStepEmpty(checkerId.id)) {
+        checkerId.style.opacity = alphaColor;
+    }
+    previousId = checkerId.id;
+    console.log(checkerId.id);
 }
 
 function isStepEmpty(checkerId) {
